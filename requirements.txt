@@ -1,0 +1,4 @@
+Flask
+pyautogui
+keyboard
+colorama

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapchat Bot Controller</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Snapchat Bot</h1>
+        <label for="shortcut_users">Users in Shortcut:</label>
+        <input type="number" id="shortcut_users" min="1" value="1">
+        <br><br>
+        <button onclick="startBot()">Start</button>
+        <button onclick="stopBot()">Stop</button>
+        <button onclick="resetPositions()">Reset Positions</button>
+        <br>
+        <button onclick="startPositioning()">Start Positioning</button>
+        <button onclick="stopPositioning()">Stop Positioning</button>
+        <br><br>
+        <div id="status"></div>
+        <br><br>
+        <button onclick="closeApp()">Close</button>
+    </div>
+    <script>
+        let positioningInterval;
+
+        function startBot() {
+            const shortcut_users = document.getElementById('shortcut_users').value;
+            fetch('/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `shortcut_users=${shortcut_users}`
+            });
+        }
+
+        function stopBot() {
+            fetch('/stop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+        }
+
+        function resetPositions() {
+            fetch('/reset_positions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }).then(() => {
+                document.getElementById('status').innerText = "Positions reset.";
+            });
+        }
+
+        function startPositioning() {
+            fetch('/start_positioning', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }).then(() => {
+                document.getElementById('status').innerText = "Positioning started...";
+                positioningInterval = setInterval(updateStatus, 500);
+            });
+        }
+
+        function stopPositioning() {
+            fetch('/stop_positioning', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }).then(() => {
+                clearInterval(positioningInterval);
+                document.getElementById('status').innerText = "Positioning stopped.";
+            });
+        }
+
+        function updateStatus() {
+            fetch('/current_message', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }).then(response => response.json())
+              .then(data => {
+                  document.getElementById('status').innerText = data.message;
+              });
+        }
+
+        function closeApp() {
+            fetch('/close', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+        }
+    </script>
+</body>
+</html>
