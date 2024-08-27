@@ -7,12 +7,16 @@ let flaskProcess;
 function createWindow() {
 	const win = new BrowserWindow({
 		width: 400,
-		height: 600,
+		height: 700,
+		icon: path.join(__dirname, '..', 'resources', 'images', 'icon.png'),
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
 		},
+		autoHideMenuBar: true,
 	});
+
+	win.setMenu(null);
 
 	win.loadURL("http://127.0.0.1:5000");
 }
