@@ -35,10 +35,7 @@ if not exist node_modules (
     echo Node.js dependencies are already installed.
 )
 
-REM Start the Flask server
-start cmd /c "python ..\main.py"
-
-REM Start the Electron app
+REM Start the Electron app, which will also start the Flask server
 npm start
 
 REM Return to the root directory

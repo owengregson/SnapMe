@@ -1,4 +1,3 @@
-# flask_server.py
 import os
 import platform
 import time
@@ -10,6 +9,7 @@ from flask import Flask, render_template, request, jsonify
 from threading import Thread, Event
 from dataclasses import dataclass, field
 
+# Initialize Flask app
 app = Flask(__name__)
 
 # Setup logging
@@ -99,7 +99,7 @@ class SnapchatBot:
                     time.sleep(self.delay)
                 else:
                     logging.error(f"Position for '{action}' not set. Skipping action.")
-            self.sent_snaps += shortcut_users
+            self.sent_snaps += 7
             self.update_console_title(shortcut_users)
             time.sleep(4)  # Wait before sending another set of snaps
 
@@ -164,10 +164,6 @@ def _positioning_guide():
             break
         bot.selector.set_position(position)
     logging.info("Positioning finished.")
-    bot.selector.current_message = "Positioning finished. Press Start to begin."
-
-def run_flask():
-    app.run(debug=False, use_reloader=False)
 
 if __name__ == '__main__':
-    run_flask()
+    app.run(debug=False, use_reloader=False)
