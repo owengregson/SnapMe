@@ -7,7 +7,7 @@ let flaskProcess;
 function createWindow() {
 	const win = new BrowserWindow({
 		width: 400,
-		height: 550,
+		height: 600,
 		icon: path.join(__dirname, '..', 'resources', 'images', 'icon.png'),
 		webPreferences: {
 			nodeIntegration: true,
