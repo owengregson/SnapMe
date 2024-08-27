@@ -69,6 +69,7 @@
         <button onclick="closeApp()">Close</button>
     </div>
     <script>
+        const { ipcRenderer } = require('electron');
         let positioningInterval;
 
         function startBot() {
@@ -79,7 +80,15 @@
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: `shortcut_users=${shortcut_users}`
-            });
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Snap sending started');
+                } else {
+                    alert('Failed to start snap sending');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function stopBot() {
@@ -88,7 +97,15 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 }
-            });
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Snap sending stopped');
+                } else {
+                    alert('Failed to stop snap sending');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function resetPositions() {
@@ -97,9 +114,15 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 }
-            }).then(() => {
-                document.getElementById('status').innerText = "Positions reset.";
-            });
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('status').innerText = "Positions reset.";
+                } else {
+                    alert('Failed to reset positions');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function startPositioning() {
@@ -108,10 +131,16 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 }
-            }).then(() => {
-                document.getElementById('status').innerText = "Positioning started...";
-                positioningInterval = setInterval(updateStatus, 500);
-            });
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('status').innerText = "Positioning started...";
+                    positioningInterval = setInterval(updateStatus, 500);
+                } else {
+                    alert('Failed to start positioning');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function stopPositioning() {
@@ -120,10 +149,16 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 }
-            }).then(() => {
-                clearInterval(positioningInterval);
-                document.getElementById('status').innerText = "Positioning stopped.";
-            });
+            })
+            .then(response => {
+                if (response.ok) {
+                    clearInterval(positioningInterval);
+                    document.getElementById('status').innerText = "Positioning stopped.";
+                } else {
+                    alert('Failed to stop positioning');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function updateStatus() {
@@ -132,19 +167,16 @@
                 headers: {
                     'Content-Type': 'application/json',
                 }
-            }).then(response => response.json())
-              .then(data => {
-                  document.getElementById('status').innerText = data.message;
-              });
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('status').innerText = data.message;
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function closeApp() {
-            fetch('/close', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            });
+            ipcRenderer.send('close-app');  // Send a message to the main process to close the app
         }
     </script>
 </body>

@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const { spawn } = require("child_process");
 const http = require("http");
@@ -20,6 +20,11 @@ function createWindow() {
 	win.setMenu(null);
 
 	win.loadURL("http://127.0.0.1:5000");
+
+	// Listen for the close-app event
+	ipcMain.on("close-app", () => {
+		win.close(); // Close the Electron window
+	});
 }
 
 function startFlaskServer() {
