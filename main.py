@@ -56,7 +56,7 @@ class PositionSelector:
 @dataclass
 class SnapchatBot:
     sent_snaps: int = 0
-    delay: float = 1.3
+    delay: float = 1.45
     selector: PositionSelector = field(default_factory=PositionSelector)
     start_time: float = 0
     is_running: bool = False
@@ -99,7 +99,7 @@ class SnapchatBot:
                     time.sleep(self.delay)
                 else:
                     logging.error(f"Position for '{action}' not set. Skipping action.")
-            self.sent_snaps += 7
+            self.sent_snaps += shortcut_users
             self.update_console_title(shortcut_users)
             time.sleep(4)  # Wait before sending another set of snaps
 
@@ -164,6 +164,7 @@ def _positioning_guide():
             break
         bot.selector.set_position(position)
     logging.info("Positioning finished.")
+    bot.selector.current_message = "Positioning finished. Press Start to begin."
 
 def run_flask():
     app.run(debug=False, use_reloader=False)
