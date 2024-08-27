@@ -5,18 +5,27 @@ import ctypes
 import pyautogui
 import keyboard
 import logging
+import datetime
 from flask import Flask, render_template, request, jsonify
 from threading import Thread, Event
 from dataclasses import dataclass, field
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtCore import QUrl
 
 app = Flask(__name__)
 
+# Get the current date and time
+now = datetime.datetime.now()
+
+# Format the date and time as 'year_month_day_time'
+log_filename = now.strftime("%Y_%m_%d_%H-%M-%S.log")
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("snapchat_bot.log"),
+        logging.FileHandler(log_filename),
         logging.StreamHandler()
     ]
 )
@@ -55,7 +64,7 @@ class PositionSelector:
 @dataclass
 class SnapchatBot:
     sent_snaps: int = 0
-    delay: float = 1.5
+    delay: float = 1.3
     selector: PositionSelector = field(default_factory=PositionSelector)
     start_time: float = 0
     is_running: bool = False
@@ -67,7 +76,7 @@ class SnapchatBot:
         now = time.time()
         elapsed = int(now - self.start_time)
         sent_snaps = self.sent_snaps * shortcut_users
-        title = (f"SnapMe - Sent Snaps: {sent_snaps} - Elapsed: {elapsed}s - Made with <3 by @owengregson on GitHub")
+        title = (f"SnapMe - Sent: {sent_snaps} - Elapsed: {elapsed}s | Made with <3 by @owengregson on GitHub")
         if not self._is_linux():
             ctypes.windll.kernel32.SetConsoleTitleW(title)
         logging.info(title)
@@ -163,10 +172,27 @@ def _positioning_guide():
             break
         bot.selector.set_position(position)
 
-def hide_console():
-    if os.name == 'nt':
-        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+def create_pyqt_window():
+    app = QApplication([])
+    window = QMainWindow()
+    window.setWindowTitle("Snapchat Bot")
+    window.setGeometry(100, 100, 800, 600)
+
+    web = QWebEngineView()
+    web.load(QUrl("http://127.0.0.1:5000/"))
+
+    central_widget = QWidget()
+    layout = QVBoxLayout(central_widget)
+    layout.addWidget(web)
+    window.setCentralWidget(central_widget)
+
+    window.show()
+    app.exec_()
 
 if __name__ == '__main__':
-    hide_console()
-    app.run(debug=False)
+    # Start the Flask app in a separate thread
+    thread = Thread(target=app.run, kwargs={'debug': False, 'use_reloader': False})
+    thread.start()
+
+    # Open the GUI in a PyQt5 window
+    create_pyqt_window()
