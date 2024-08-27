@@ -2,6 +2,4 @@ Flask
 pyautogui
 keyboard
 colorama
-PyQt5
-PyQtWebEngine
 datetime

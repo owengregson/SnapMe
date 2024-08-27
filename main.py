@@ -1,3 +1,4 @@
+# flask_server.py
 import os
 import platform
 import time
@@ -5,27 +6,18 @@ import ctypes
 import pyautogui
 import keyboard
 import logging
-import datetime
 from flask import Flask, render_template, request, jsonify
 from threading import Thread, Event
 from dataclasses import dataclass, field
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtCore import QUrl
 
 app = Flask(__name__)
 
-# Get the current date and time
-now = datetime.datetime.now()
-
-# Format the date and time as 'year_month_day_time'
-log_filename = now.strftime("%Y_%m_%d_%H-%M-%S.log")
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(log_filename),
+        logging.FileHandler("snapchat_bot.log"),
         logging.StreamHandler()
     ]
 )
@@ -164,35 +156,17 @@ def close():
 
 def _positioning_guide():
     positions = [
-        "camera", "take_picture", "arrow_down", "multi_snap",
-        "edit_send", "send_to", "shortcut", "select_all", "send_snap"
+        "camera", "take_picture", "edit_send", "send_to",
+        "shortcut", "select_all", "send_snap"
     ]
     for position in positions:
         if bot.selector.stop_event.is_set():
             break
         bot.selector.set_position(position)
+    logging.info("Positioning finished.")
 
-def create_pyqt_window():
-    app = QApplication([])
-    window = QMainWindow()
-    window.setWindowTitle("Snapchat Bot")
-    window.setGeometry(100, 100, 800, 600)
-
-    web = QWebEngineView()
-    web.load(QUrl("http://127.0.0.1:5000/"))
-
-    central_widget = QWidget()
-    layout = QVBoxLayout(central_widget)
-    layout.addWidget(web)
-    window.setCentralWidget(central_widget)
-
-    window.show()
-    app.exec_()
+def run_flask():
+    app.run(debug=False, use_reloader=False)
 
 if __name__ == '__main__':
-    # Start the Flask app in a separate thread
-    thread = Thread(target=app.run, kwargs={'debug': False, 'use_reloader': False})
-    thread.start()
-
-    # Open the GUI in a PyQt5 window
-    create_pyqt_window()
+    run_flask()
